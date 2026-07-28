@@ -45,14 +45,17 @@ lab-homepage/
 │   ├── site.css                      shared design system
 │   └── site.js                       injects header/footer, nav dropdowns, carousel
 └── images/
-    ├── team/, gallery/                existing placeholder photos (not real photos)
+    ├── team/                          real photos for most members (see below)
+    ├── gallery/                       still placeholder photos
     └── placeholders/                  generic placeholders used by the new pages
 ```
 
-Member photos are still illustrated placeholders, not real photos — those
-weren't pulled in automatically to avoid republishing anyone's personal
-photo without a direct OK. Swap the files under `images/team/` whenever
-real photos are ready.
+Real photos are wired in for HyunChul Kim, Nguyen Ba Hieu, Shantharaja,
+Shambhulinga Araleka, Vuong Duc Thinh, Ngo Cam Tu, Lit Le, Nguyen Chi
+Thien, 이완태, and 전형준. 이주영 and 조지현 (undergrad) still use the
+illustrated placeholder — drop their photos into `images/team/` and update
+the `<img src>` in `member/master-student.html` /
+`member/undergraduate-student.html` once available.
 
 Pages marked **template** share the same components as their filled-in
 counterpart (`.member-card`, `.pub-year-band` + `.pub-list-year`, or
