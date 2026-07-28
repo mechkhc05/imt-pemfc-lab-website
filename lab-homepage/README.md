@@ -32,7 +32,9 @@ lab-homepage/
 │   ├── master-student.html           filled in — 5 master's students
 │   ├── undergraduate-student.html    filled in — 1 undergrad
 │   └── alumni.html                   filled in — 1 alumnus
-├── research/index.html               filled in — 8 real research themes
+├── research/index.html               filled in — 8 themes, each with a real
+│                                      figure pulled from one of the lab's
+│                                      own papers (images/research/)
 ├── publication/
 │   ├── index.html                    category landing
 │   ├── paper.html                    filled in — 22 papers, 2022-2026
