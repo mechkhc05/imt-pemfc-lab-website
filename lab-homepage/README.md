@@ -10,37 +10,49 @@ Publication list, Contact page with map) mirrors the composition of
 [HOPE Lab's site](https://sites.google.com/view/hopelab2020/home), rebuilt
 as a static, no-build-step HTML/CSS/JS site instead of Google Sites.
 
+Real content (bio, member roster, research themes, address/contact) has
+been migrated in from the lab's actual
+[Google Sites page](https://sites.google.com/view/imtlab23/home) where
+available. Publications and event photos are intentionally left as-is —
+newer files for those are still coming.
+
 ## Structure
 
 ```
 lab-homepage/
-├── index.html                        Home
+├── index.html                        Home — real "Our expertise" text
 ├── member/
 │   ├── index.html                    category landing
-│   ├── professor.html                filled in — Prof. Hyun-Chul Kim
-│   ├── research-professor.html       template
-│   ├── postdoctoral-fellow.html      template
-│   ├── phd-candidate.html            template
-│   ├── master-student.html           template
-│   ├── undergraduate-student.html    template
-│   └── alumni.html                   template
-├── research/index.html               filled in — 6 research themes
+│   ├── professor.html                filled in — Prof. HyunChul Kim
+│   ├── research-professor.html       template (no current member)
+│   ├── postdoctoral-fellow.html      filled in — 3 postdocs
+│   ├── phd-candidate.html            filled in — 1 Ph.D candidate
+│   ├── master-student.html           filled in — 5 master's students
+│   ├── undergraduate-student.html    filled in — 1 undergrad
+│   └── alumni.html                   filled in — 1 alumnus
+├── research/index.html               filled in — 8 real research themes
 ├── publication/
 │   ├── index.html                    category landing
-│   ├── paper.html                    filled in — real publication list
+│   ├── paper.html                    filled in, but not yet the latest list —
+│   │                                  awaiting updated files
 │   ├── patent.html                   template
 │   └── conference.html               template
 ├── achievement/index.html            template
-├── event/index.html                  template
+├── event/index.html                  template — awaiting event photos
 ├── benefit/index.html                template
-├── contact/index.html                filled in — opening + map
+├── contact/index.html                filled in — real address, phone, email
 ├── assets/
 │   ├── site.css                      shared design system
 │   └── site.js                       injects header/footer, nav dropdowns, carousel
 └── images/
-    ├── team/, gallery/                existing placeholder photos
+    ├── team/, gallery/                existing placeholder photos (not real photos)
     └── placeholders/                  generic placeholders used by the new pages
 ```
+
+Member photos are still illustrated placeholders, not real photos — those
+weren't pulled in automatically to avoid republishing anyone's personal
+photo without a direct OK. Swap the files under `images/team/` whenever
+real photos are ready.
 
 Pages marked **template** share the same components as their filled-in
 counterpart (`.member-card`, `.pub-year-band` + `.pub-list-year`, or

@@ -109,8 +109,8 @@
       '<div class="footer-row">' +
         '<div class="foot-text">' +
           "<b>Intelligent Manufacturing Technology &amp; PEMFC Laboratory</b><br/>" +
-          "Director: Prof. Hyun-Chul Kim &middot; Future &amp; Automotive Engineering Department<br/>" +
-          "Cheonan-daero 1223-24, Seobuk-gu, Cheonan-si, Chungcheongnam-do, 31080 &middot; Tel. 041-521-9273" +
+          "Director: Prof. HyunChul Kim &middot; Future &amp; Automotive Engineering Department<br/>" +
+          "Room 106, Building 7, Cheonan Campus, Cheonan-daero 1223-24, Seobuk-gu, Cheonan-si, Chungcheongnam-do, 31080 &middot; Tel. 041-521-9273" +
         "</div>" +
         '<div class="foot-mark">&copy; 2026 KONGJU NATIONAL UNIVERSITY</div>' +
       "</div>";
