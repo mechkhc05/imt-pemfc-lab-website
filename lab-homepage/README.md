@@ -13,8 +13,10 @@ as a static, no-build-step HTML/CSS/JS site instead of Google Sites.
 Real content (bio, member roster, research themes, address/contact) has
 been migrated in from the lab's actual
 [Google Sites page](https://sites.google.com/view/imtlab23/home) where
-available. Publications and event photos are intentionally left as-is —
-newer files for those are still coming.
+available. The publication list (2022&ndash;2026, 22 papers) was compiled
+from the lab's own paper PDFs and cross-checked against each journal's
+listing for the exact volume/pages/DOI. Event photos are still
+placeholders — newer files for those are coming.
 
 ## Structure
 
@@ -33,8 +35,7 @@ lab-homepage/
 ├── research/index.html               filled in — 8 real research themes
 ├── publication/
 │   ├── index.html                    category landing
-│   ├── paper.html                    filled in, but not yet the latest list —
-│   │                                  awaiting updated files
+│   ├── paper.html                    filled in — 22 papers, 2022-2026
 │   ├── patent.html                   template
 │   └── conference.html               template
 ├── achievement/index.html            template
