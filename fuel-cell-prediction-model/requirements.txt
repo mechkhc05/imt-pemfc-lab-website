@@ -1,5 +1,9 @@
+--extra-index-url https://download.pytorch.org/whl/cpu
+
+numpy<2
 pandas
 openpyxl
 scikit-learn
 xgboost
-numpy
+torch
+matplotlib

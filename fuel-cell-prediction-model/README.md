@@ -54,7 +54,11 @@ REST/WebSocket으로 요청해 실시간 시각화.
 - [x] **Phase 0 — Baseline 재현**: 이 프로젝트의 CFD 데이터셋으로 논문의
       XGBoost 결과를 재현해 데이터 파이프라인 검증 완료 (`src/baseline_reproduce.py`).
       Optuna 튜닝 없이도 논문 수치와 근접 (PD R²=0.988, SE R²=0.999, ODU R²=0.921).
-- [ ] **Phase 1 — PINN**: 분극곡선 물리 잔차 + CFD 데이터 손실 결합 모델
+- [x] **Phase 1 — PINN**: 분극곡선 물리 잔차 + CFD 데이터 손실 결합 모델.
+      실험 I-V 데이터로 물리식 자체를 검증(R²=0.9996)하고, 그 계수로 앵커링.
+      **전압 외삽에서 XGBoost 대비 명확한 우위 확인** (R²=0.664 vs 0.773).
+      다른 조건(온도/압력/습도/화학양론비) 외삽은 아직 개선 필요.
+      → 자세한 내용/전체 결과표: [`docs/phase1_findings.md`](docs/phase1_findings.md)
 - [ ] **Phase 2 — DeepONet**: PINN 기반 합성 데이터로 실시간 추론 모델 학습
 - [ ] **Phase 3 — Unity 연동**: Python 서빙 서버 + Unity 클라이언트
 - [ ] **Phase 4 — 논문 작성**
@@ -70,20 +74,36 @@ REST/WebSocket으로 요청해 실시간 시각화.
 출력 3개: `power density`, `System efficiency`, `stand devision o2` (O₂
 분포 균일도, 논문의 ODU).
 
+`data/raw/0kpa_I-V_curve.xlsx` — 연구실 실측 분극곡선 (70°C, ~1atm, RH100%,
+stoi 3.5), 2회 반복 측정. PINN 물리 계수를 앵커링하는 데 사용.
+
 ## 실행
 
 ```bash
-pip install -r requirements.txt
-python src/baseline_reproduce.py
+python -m venv .venv
+./.venv/Scripts/pip install -r requirements.txt   # Windows
+python src/baseline_reproduce.py           # Phase 0: baseline 재현
+python src/fit_experimental_iv.py          # 실험 데이터로 물리식 검증
+python src/train_pinn.py                   # Phase 1: PINN 학습 (전체 데이터)
+python src/data_efficiency_experiment.py   # 보간 성능 비교
+python src/extrapolation_sweep.py          # 외삽 성능 비교 (핵심 검증)
 ```
 
 ## 폴더 구조
 
 ```
 fuel-cell-prediction-model/
-├── data/raw/         CFD 데이터셋
-├── src/              모델 코드
-├── notebooks/        탐색/실험용
-├── unity/            Unity 프로젝트 (추후)
+├── data/raw/           CFD 데이터셋 + 실험 I-V 데이터
+├── src/
+│   ├── baseline_reproduce.py
+│   ├── fit_experimental_iv.py
+│   ├── train_pinn.py
+│   ├── data_efficiency_experiment.py
+│   ├── extrapolation_experiment.py
+│   ├── extrapolation_sweep.py
+│   └── pinn/            PINN 모델 (model.py, physics.py)
+├── docs/                결과 정리 문서 (phase1_findings.md)
+├── notebooks/           탐색/실험용
+├── unity/               Unity 프로젝트 (추후)
 └── requirements.txt
 ```
