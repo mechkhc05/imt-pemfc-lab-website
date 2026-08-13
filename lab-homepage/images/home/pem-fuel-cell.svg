@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <rect width="800" height="600" fill="#eef2f0"/>
+
+  <!-- external circuit / load -->
+  <path d="M300,150 L300,95 L500,95 L500,150" fill="none" stroke="#a85a2a" stroke-width="4" stroke-linecap="round"/>
+  <rect x="365" y="80" width="70" height="30" rx="4" fill="#ffffff" stroke="#a85a2a" stroke-width="3"/>
+  <text x="400" y="101" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="13" fill="#7a3f1c" font-weight="600">LOAD</text>
+  <polygon points="345,95 337,86 337,104" fill="#a85a2a"/>
+  <text x="330" y="75" text-anchor="middle" font-family="Consolas, monospace" font-size="15" fill="#7a3f1c">e&#8315;</text>
+  <text x="470" y="75" text-anchor="middle" font-family="Consolas, monospace" font-size="15" fill="#7a3f1c">e&#8315;</text>
+
+  <!-- bipolar plates -->
+  <rect x="265" y="150" width="70" height="320" fill="#6b5340"/>
+  <rect x="465" y="150" width="70" height="320" fill="#6b5340"/>
+
+  <!-- flow channel grooves -->
+  <path d="M285,170 L305,190 L285,210 L305,230 L285,250 L305,270 L285,290 L305,310 L285,330 L305,350 L285,370 L305,390 L285,410 L305,430 L285,450"
+        fill="none" stroke="#c7a98a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M515,170 L495,190 L515,210 L495,230 L515,250 L495,270 L515,290 L495,310 L515,330 L495,350 L515,370 L495,390 L515,410 L495,430 L515,450"
+        fill="none" stroke="#c7a98a" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- gas diffusion layers -->
+  <rect x="335" y="150" width="25" height="320" fill="#c7d2ce"/>
+  <rect x="440" y="150" width="25" height="320" fill="#c7d2ce"/>
+
+  <!-- catalyst layers -->
+  <rect x="360" y="150" width="10" height="320" fill="#1e6b63"/>
+  <rect x="430" y="150" width="10" height="320" fill="#1e6b63"/>
+
+  <!-- membrane -->
+  <rect x="370" y="150" width="60" height="320" fill="#d9e8e4" stroke="#1e6b63" stroke-width="2"/>
+  <text x="400" y="315" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="16" fill="#1e6b63" font-weight="700" transform="rotate(-90 400 315)">PEM</text>
+
+  <!-- proton flow through membrane -->
+  <line x1="378" y1="230" x2="422" y2="230" stroke="#7a3f1c" stroke-width="2.5" stroke-dasharray="5 4"/>
+  <polygon points="422,230 413,225 413,235" fill="#7a3f1c"/>
+  <text x="400" y="220" text-anchor="middle" font-family="Consolas, monospace" font-size="14" fill="#7a3f1c">H&#8314;</text>
+
+  <!-- H2 in -->
+  <line x1="90" y1="300" x2="255" y2="300" stroke="#a85a2a" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="265,300 248,290 248,310" fill="#a85a2a"/>
+  <text x="150" y="270" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#7a3f1c" font-weight="700">H&#8322;</text>
+
+  <!-- O2 in -->
+  <line x1="710" y1="300" x2="545" y2="300" stroke="#1e6b63" stroke-width="6" stroke-linecap="round"/>
+  <polygon points="535,300 552,290 552,310" fill="#1e6b63"/>
+  <text x="650" y="270" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="20" fill="#1e6b63" font-weight="700">O&#8322; (air)</text>
+
+  <!-- H2O out -->
+  <line x1="500" y1="480" x2="500" y2="520" stroke="#1e6b63" stroke-width="5" stroke-linecap="round"/>
+  <polygon points="500,530 492,514 508,514" fill="#1e6b63"/>
+  <text x="500" y="552" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="18" fill="#1e6b63" font-weight="700">H&#8322;O</text>
+
+  <!-- anode / cathode labels -->
+  <text x="300" y="500" text-anchor="middle" font-family="Consolas, monospace" font-size="13" fill="#7a3f1c" letter-spacing="1">ANODE</text>
+  <text x="500" y="500" text-anchor="middle" font-family="Consolas, monospace" font-size="13" fill="#1e6b63" letter-spacing="1">CATHODE</text>
+
+  <text x="400" y="580" text-anchor="middle" font-family="Helvetica, Arial, sans-serif" font-size="19" fill="#12191a" font-weight="600">PEM Fuel Cell</text>
+</svg>

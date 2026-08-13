@@ -9,13 +9,12 @@
     {
       id: "member", label: "Member", href: "member/index.html",
       children: [
-        { id: "professor", label: "Professor", href: "member/professor.html" },
-        { id: "research-professor", label: "Research Professor", href: "member/research-professor.html" },
-        { id: "postdoctoral-fellow", label: "Postdoctoral Fellow", href: "member/postdoctoral-fellow.html" },
-        { id: "phd-candidate", label: "Ph.D Candidate", href: "member/phd-candidate.html" },
-        { id: "master-student", label: "Master Student", href: "member/master-student.html" },
-        { id: "undergraduate-student", label: "Undergraduate Student", href: "member/undergraduate-student.html" },
-        { id: "alumni", label: "Alumni", href: "member/alumni.html" }
+        { id: "professor", label: "Professor", href: "member/index.html#professor" },
+        { id: "postdoctoral-fellow", label: "Postdoctoral Fellow", href: "member/index.html#postdoctoral-fellow" },
+        { id: "phd-candidate", label: "Ph.D Candidate", href: "member/index.html#phd-candidate" },
+        { id: "master-student", label: "Master Student", href: "member/index.html#master-student" },
+        { id: "undergraduate-student", label: "Undergraduate Student", href: "member/index.html#undergraduate-student" },
+        { id: "alumni", label: "Alumni", href: "member/index.html#alumni" }
       ]
     },
     { id: "research", label: "Research", href: "research/index.html" },
@@ -27,9 +26,7 @@
         { id: "conference", label: "Conference", href: "publication/conference.html" }
       ]
     },
-    { id: "achievement", label: "Achievement", href: "achievement/index.html" },
     { id: "event", label: "Event", href: "event/index.html" },
-    { id: "benefit", label: "Benefit", href: "benefit/index.html" },
     { id: "contact", label: "Contact", href: "contact/index.html" }
   ];
 

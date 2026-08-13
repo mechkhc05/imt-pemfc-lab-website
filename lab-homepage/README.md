@@ -15,8 +15,9 @@ been migrated in from the lab's actual
 [Google Sites page](https://sites.google.com/view/imtlab23/home) where
 available. The publication list (2022&ndash;2026, 22 papers) was compiled
 from the lab's own paper PDFs and cross-checked against each journal's
-listing for the exact volume/pages/DOI. Event photos are still
-placeholders — newer files for those are coming.
+listing for the exact volume/pages/DOI. The Event page has its first two
+real photos in; captions (event name/date) are still placeholders since
+those weren't provided yet.
 
 ## Structure
 
@@ -24,14 +25,18 @@ placeholders — newer files for those are coming.
 lab-homepage/
 ├── index.html                        Home — real "Our expertise" text
 ├── member/
-│   ├── index.html                    category landing
-│   ├── professor.html                filled in — Prof. HyunChul Kim
-│   ├── research-professor.html       template (no current member)
-│   ├── postdoctoral-fellow.html      filled in — 3 postdocs
-│   ├── phd-candidate.html            filled in — 1 Ph.D candidate
-│   ├── master-student.html           filled in — 5 master's students
-│   ├── undergraduate-student.html    filled in — 1 undergrad
-│   └── alumni.html                   filled in — 1 alumnus
+│   └── index.html                    all roles on one page (Professor,
+│                                      Postdoctoral Fellow, Ph.D Candidate,
+│                                      Master Student, Undergraduate
+│                                      Student, Alumni) — no per-role pages,
+│                                      no Research Professor (no current member).
+│                                      Postdoc/Ph.D/Master/Undergrad each show
+│                                      a `.research-card`: photo+name next to
+│                                      their own research figure + summary
+├── templates/
+│   └── student-research-template.md  hand to each student to fill in and
+│                                      send back (photo, research figure,
+│                                      short write-up, keywords)
 ├── research/index.html               filled in — 8 themes, each with a real
 │                                      figure pulled from one of the lab's
 │                                      own papers (images/research/)
@@ -40,9 +45,7 @@ lab-homepage/
 │   ├── paper.html                    filled in — 22 papers, 2022-2026
 │   ├── patent.html                   template
 │   └── conference.html               template
-├── achievement/index.html            template
-├── event/index.html                  template — awaiting event photos
-├── benefit/index.html                template
+├── event/index.html                  2 real photos in, captions pending
 ├── contact/index.html                filled in — real address, phone, email
 ├── assets/
 │   ├── site.css                      shared design system
@@ -55,10 +58,15 @@ lab-homepage/
 
 Real photos are wired in for HyunChul Kim, Nguyen Ba Hieu, Shantharaja,
 Shambhulinga Araleka, Vuong Duc Thinh, Ngo Cam Tu, Lit Le, Nguyen Chi
-Thien, 이완태, and 전형준. 이주영 and 조지현 (undergrad) still use the
-illustrated placeholder — drop their photos into `images/team/` and update
-the `<img src>` in `member/master-student.html` /
-`member/undergraduate-student.html` once available.
+Thien, 선민호 (Minho Sun), 한순민 (Sunmin Han), 이완태, and 전형준. 이주영,
+조지현 (undergrad), and 황선재 still use the illustrated placeholder — drop
+their photos into `images/team/` and update the `<img src>` for their
+card in `member/index.html` once available.
+
+Research cards are filled in for Shantharaja (no figure submitted yet —
+still shows the placeholder figure), Vuong Duc Thinh, Lit Le, Nguyen Chi
+Thien, 선민호, 한순민, and 황선재 (no photo or figure submitted yet). Still
+pending a submission: Nguyen Ba Hieu, Shambhulinga Araleka, 이주영, 이완태.
 
 Pages marked **template** share the same components as their filled-in
 counterpart (`.member-card`, `.pub-year-band` + `.pub-list-year`, or
@@ -92,8 +100,21 @@ then open `http://localhost:8090/index.html`.
 
 - **Member photos**: replace files under `images/team/`, or add new ones and
   point a `.member-card`'s `<img>` at them.
+- **Student research cards**: send each postdoc/Ph.D/master/undergrad student
+  `templates/student-research-template.md`. Once they send back their photo,
+  one research figure, and a short write-up, drop the figure into
+  `images/research/` (or `images/team/`), duplicate a `.research-card` block
+  in `member/index.html`, and fill in `rc-figure`, `rc-title`, and `rc-desc`.
+  An optional `.rc-keywords` list of `<span>` tags can hold 2&ndash;4 keywords.
 - **Publications**: copy a `<li>` inside `.pub-list-year` on
   `publication/paper.html`; start a new `.pub-year-band` for a new year.
-- **Highlights / Achievements / Events**: copy a `.highlight-card` block.
+- **Highlights — Latest Paper**: the lab has no journal cover yet, so this
+  slot always shows the most recently published paper instead. Each time a
+  new paper comes out, swap its image for that paper's graphical abstract (or
+  a photo of the student author if there's no abstract figure), and update
+  the `.tag` (journal &middot; year) and `.desc` (title &mdash; authors) text
+  in the first `.highlight-card` on `index.html`. Switch the column back to
+  an actual "Cover" once the lab lands a real journal cover.
+- **Highlights — Award / Event**: copy a `.highlight-card` block.
 - Replace any `images/placeholders/*.svg` with a real photo of the same
   filename, or update the `src` to point at a new file.

@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="480" height="360" viewBox="0 0 480 360">
+  <rect width="480" height="360" fill="#ecdbc9"/>
+  <rect x="1" y="1" width="478" height="358" fill="none" stroke="rgba(18,25,26,0.25)" stroke-width="2" stroke-dasharray="6 6"/>
+  <path d="M60 260l70-90 60 60 50-70 90 100" fill="none" stroke="#7a3f1c" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="130" cy="170" r="8" fill="#7a3f1c"/>
+  <circle cx="190" cy="230" r="8" fill="#7a3f1c"/>
+  <circle cx="240" cy="160" r="8" fill="#7a3f1c"/>
+  <text x="240" y="310" text-anchor="middle" font-family="Consolas, monospace" font-size="15" fill="#7a3f1c" letter-spacing="1">ADD RESEARCH FIGURE</text>
+</svg>
