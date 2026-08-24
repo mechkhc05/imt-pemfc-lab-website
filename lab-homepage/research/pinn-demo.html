@@ -1,0 +1,454 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PINN Operating-Condition Explorer — IMT &amp; PEMFC Lab</title>
+<meta name="description" content="Interactive demo of the lab's physics-informed neural network (PINN) surrogate model for PEMFC performance — adjust operating conditions and see predicted current, power, efficiency, and O2 uniformity update live, entirely in your browser." />
+<link rel="stylesheet" href="../assets/site.css" />
+<style>
+  .pinn-demo {
+    --s-current: #2a78d6; --s-power: #eb6834; --s-se: #1baf7a; --s-odu: #eda100;
+  }
+  @media (prefers-color-scheme: dark) {
+    .pinn-demo { --s-current: #3987e5; --s-power: #d95926; --s-se: #199e70; --s-odu: #c98500; }
+  }
+  :root[data-theme="dark"] .pinn-demo { --s-current: #3987e5; --s-power: #d95926; --s-se: #199e70; --s-odu: #c98500; }
+
+  .pinn-demo { display: grid; grid-template-columns: 20rem 1fr; gap: 1.6rem; align-items: start; }
+  @media (max-width: 880px) { .pinn-demo { grid-template-columns: 1fr; } }
+
+  .pinn-card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 1.3rem 1.4rem 1.5rem; }
+  .pinn-card h3 { font-size: 1.02rem; }
+
+  .pinn-sliders { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.9rem; }
+  .pinn-slider-row label { display: flex; justify-content: space-between; font-size: 0.86rem; color: var(--ink-soft); margin-bottom: 0.3rem; }
+  .pinn-slider-row .pv { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 600; }
+  .pinn-slider-row input[type="range"] {
+    width: 100%; appearance: none; height: 4px; border-radius: 999px; background: var(--line-strong); outline: none;
+  }
+  .pinn-slider-row input[type="range"]::-webkit-slider-thumb {
+    appearance: none; width: 15px; height: 15px; border-radius: 50%; background: var(--copper);
+    border: 2px solid var(--paper-raised); box-shadow: 0 0 0 1px var(--line-strong); cursor: pointer;
+  }
+  .pinn-slider-row input[type="range"]::-moz-range-thumb {
+    width: 13px; height: 13px; border-radius: 50%; background: var(--copper);
+    border: 2px solid var(--paper-raised); box-shadow: 0 0 0 1px var(--line-strong); cursor: pointer;
+  }
+  .pinn-slider-row.voltage input[type="range"]::-webkit-slider-thumb { background: var(--ink); }
+  .pinn-slider-row.voltage input[type="range"]::-moz-range-thumb { background: var(--ink); }
+
+  .pinn-readout { margin-top: 1.4rem; padding-top: 1.1rem; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 0.55rem; }
+  .pinn-readout-row { display: flex; align-items: baseline; gap: 0.55rem; font-size: 0.92rem; }
+  .pinn-readout-row .swatch { width: 0.7rem; height: 0.7rem; border-radius: 50%; flex-shrink: 0; }
+  .pinn-readout-row .ro-label { color: var(--ink-soft); flex: 1; }
+  .pinn-readout-row .ro-value { font-family: ui-monospace, monospace; font-variant-numeric: tabular-nums; font-weight: 700; color: var(--ink); }
+
+  .pinn-charts { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+  @media (max-width: 560px) { .pinn-charts { grid-template-columns: 1fr; } }
+  .pinn-chart-card { background: var(--paper-raised); border: 1px solid var(--line); border-radius: var(--radius); padding: 1rem 1rem 0.6rem; }
+  .pinn-chart-card h4 { font-size: 0.9rem; color: var(--ink-soft); font-weight: 700; }
+  .pinn-chart-card svg { width: 100%; height: auto; display: block; margin-top: 0.4rem; touch-action: none; }
+  .pinn-chart-card .axis { stroke: var(--line-strong); stroke-width: 1; fill: none; }
+  .pinn-chart-card .tick-label { font-family: ui-monospace, monospace; font-size: 8.5px; fill: var(--ink-faint); }
+  .pinn-chart-card .x-label { font-size: 8.5px; fill: var(--ink-faint); }
+  .pinn-chart-card .curve { stroke-width: 2; fill: none; stroke-linejoin: round; stroke-linecap: round; }
+  .pinn-chart-card .live-line { stroke: var(--ink-faint); stroke-width: 1.25; }
+  .pinn-chart-card .live-ring { fill: var(--paper-raised); }
+  .pinn-chart-card .live-label { font-family: ui-monospace, monospace; font-size: 10px; font-weight: 700; fill: var(--ink); }
+  .pinn-chart-card .hover-line { stroke: var(--line-strong); stroke-width: 1; }
+  .pinn-chart-card .hover-tip-bg { fill: var(--header-bg); stroke: var(--line-strong); stroke-width: 1; }
+  .pinn-chart-card .hover-tip-text { font-family: ui-monospace, monospace; font-size: 9px; fill: var(--header-ink); }
+
+  .pinn-status { margin-top: 1rem; font-size: 0.9rem; color: var(--ink-faint); }
+</style>
+</head>
+<body data-page="research" data-base="../">
+<div id="site-header"></div>
+
+<section class="page-title">
+  <div class="wrap">
+    <h1>PEMFC PINN Operating-Condition Explorer</h1>
+    <p>An interactive demo of the lab's physics-informed neural network (PINN) surrogate model. Move any slider and watch predicted performance update live &mdash; entirely in your browser.</p>
+  </div>
+</section>
+
+<section class="page-content">
+  <div class="wrap">
+    <p>The model was trained on CFD simulation data spanning realistic PEMFC operating envelopes, and predicts four performance quantities &mdash; current density, power density, system efficiency, and O<sub>2</sub> distribution uniformity (ODU) &mdash; as a function of eight operating conditions. Adjust any condition on the left; each chart on the right re-sweeps the full 0.4&ndash;0.9&thinsp;V cell-voltage range and marks where the current voltage slider sits on that curve. This tool extends the surrogate-modeling approach behind our lab's <a href="https://doi.org/10.1016/j.jiec.2025.10.027" target="_blank" rel="noopener">comparative PEMFC ML-surrogate study (Ngo et al., <i>J. Ind. Eng. Chem.</i>, 2025)</a>, and is offered here for exploration &mdash; it is a trained surrogate, not a substitute for experimental or CFD validation.</p>
+
+    <div class="pinn-demo" id="pinn-demo">
+      <div class="pinn-card">
+        <h3>Operating conditions</h3>
+        <div class="pinn-sliders" id="pinn-sliders"></div>
+        <div class="pinn-readout" id="pinn-readout"></div>
+      </div>
+      <div class="pinn-charts" id="pinn-charts"></div>
+    </div>
+
+    <p class="pinn-status" id="pinn-status">Loading model weights&hellip;</p>
+  </div>
+</section>
+
+<div id="site-footer"></div>
+<script src="../assets/site.js"></script>
+<script src="data/pemfc-pinn-weights.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  var RAW_SPECS = [
+    { key: "Pressure",            label: "Pressure",              unit: "atm", lo: 1.0, hi: 3.0 },
+    { key: "anode temperature",   label: "Anode Temp",            unit: "°C", lo: 50.0, hi: 100.0 },
+    { key: "anode humidity",      label: "Anode RH",              unit: "%", lo: 20.0, hi: 100.0 },
+    { key: "anode stoi",          label: "Anode Stoi (H₂ supply)", unit: "", lo: 1.0, hi: 5.0 },
+    { key: "cathode temperature", label: "Cathode Temp",          unit: "°C", lo: 50.0, hi: 100.0 },
+    { key: "Cathode humidity",    label: "Cathode RH",            unit: "%", lo: 20.0, hi: 100.0 },
+    { key: "cathode stoi",        label: "Cathode Stoi (O₂ supply)", unit: "", lo: 1.5, hi: 5.5 },
+    { key: "voltage",             label: "Voltage",               unit: "V", lo: 0.4, hi: 0.9 }
+  ];
+
+  var SERIES = [
+    { key: "current", label: "Current density", unit: "A/cm²", lo: 0.0, hi: 3.0, color: "var(--s-current)" },
+    { key: "power",   label: "Power density",    unit: "W/cm²", lo: 0.0, hi: 1.5, color: "var(--s-power)" },
+    { key: "se",      label: "System efficiency", unit: "",         lo: -0.5, hi: 0.5, color: "var(--s-se)" },
+    { key: "odu",     label: "O₂ uniformity (ODU)", unit: "",  lo: 0.0, hi: 6.0, color: "var(--s-odu)" }
+  ];
+
+  var N_SWEEP = 41;
+  var VOLT_LO = 0.4, VOLT_HI = 0.9;
+
+  // ---- pure-JS re-implementation of the exported PINN (no dependencies) ----
+  function linear(x, layer) {
+    var w = layer.weight, b = layer.bias, out = new Array(b.length);
+    for (var i = 0; i < b.length; i++) {
+      var s = b[i], wi = w[i];
+      for (var j = 0; j < x.length; j++) s += wi[j] * x[j];
+      out[i] = s;
+    }
+    return out;
+  }
+  function tanhVec(x) { return x.map(Math.tanh); }
+  function softplus(v) { return v > 20 ? v : Math.log1p(Math.exp(v)); }
+
+  function currentNetForward(xNorm, layers) {
+    var h = xNorm;
+    for (var idx = 0; idx < layers.length; idx++) {
+      h = linear(h, layers[idx]);
+      h = idx < layers.length - 1 ? tanhVec(h) : h.map(softplus);
+    }
+    return h[0];
+  }
+  function headForward(headIn, layers) {
+    var h = headIn;
+    for (var idx = 0; idx < layers.length; idx++) {
+      h = linear(h, layers[idx]);
+      if (idx < layers.length - 1) h = tanhVec(h);
+    }
+    return h[0];
+  }
+
+  function predict(raw, W) {
+    var xRaw = W.raw_cols.map(function (c) { return raw[c]; });
+    var xNorm = xRaw.map(function (v, i) { return (v - W.scaler_mean[i]) / W.scaler_scale[i]; });
+    var iHat = currentNetForward(xNorm, W.current_net);
+    var pdHat = iHat * raw.voltage;
+    var headIn = xNorm.concat([iHat]);
+    var seHat = headForward(headIn, W.se_head);
+    var oduHat = headForward(headIn, W.odu_head);
+    return { current: iHat, power: pdHat, se: seHat, odu: oduHat };
+  }
+
+  // ---------------------------------------------------------------- UI ----
+  var slidersEl = document.getElementById("pinn-sliders");
+  var readoutEl = document.getElementById("pinn-readout");
+  var chartsEl = document.getElementById("pinn-charts");
+  var statusEl = document.getElementById("pinn-status");
+
+  var sliderInputs = {};
+  var readoutValueEls = {};
+
+  RAW_SPECS.forEach(function (spec) {
+    var row = document.createElement("div");
+    row.className = "pinn-slider-row" + (spec.key === "voltage" ? " voltage" : "");
+
+    var label = document.createElement("label");
+    var nameSpan = document.createElement("span");
+    nameSpan.textContent = spec.label + (spec.unit ? " (" + spec.unit + ")" : "");
+    var pv = document.createElement("span");
+    pv.className = "pv";
+    label.appendChild(nameSpan);
+    label.appendChild(pv);
+
+    var input = document.createElement("input");
+    input.type = "range";
+    input.min = String(spec.lo);
+    input.max = String(spec.hi);
+    input.step = String((spec.hi - spec.lo) / 500);
+    input.value = String((spec.lo + spec.hi) / 2);
+    input.setAttribute("aria-label", spec.label);
+
+    row.appendChild(label);
+    row.appendChild(input);
+    slidersEl.appendChild(row);
+
+    sliderInputs[spec.key] = input;
+    input.addEventListener("input", scheduleUpdate);
+  });
+
+  SERIES.forEach(function (s) {
+    var row = document.createElement("div");
+    row.className = "pinn-readout-row";
+    var sw = document.createElement("span");
+    sw.className = "swatch";
+    sw.style.background = s.color;
+    var lbl = document.createElement("span");
+    lbl.className = "ro-label";
+    lbl.textContent = s.label;
+    var val = document.createElement("span");
+    val.className = "ro-value";
+    val.textContent = "–";
+    row.appendChild(sw);
+    row.appendChild(lbl);
+    row.appendChild(val);
+    readoutEl.appendChild(row);
+    readoutValueEls[s.key] = val;
+  });
+
+  var SVG_NS = "http://www.w3.org/2000/svg";
+  var VB_W = 320, VB_H = 190;
+  var M = { l: 32, r: 10, t: 10, b: 24 };
+  var PLOT_W = VB_W - M.l - M.r, PLOT_H = VB_H - M.t - M.b;
+
+  function fmt(v, digits) {
+    return v.toFixed(digits == null ? 3 : digits);
+  }
+
+  function vx(v) { return M.l + PLOT_W * (v - VOLT_LO) / (VOLT_HI - VOLT_LO); }
+  function chartVy(series, val) {
+    var t = (val - series.lo) / (series.hi - series.lo);
+    return M.t + PLOT_H * (1 - t);
+  }
+
+  var chartRefs = {};
+
+  SERIES.forEach(function (s) {
+    var card = document.createElement("div");
+    card.className = "pinn-chart-card";
+    var h4 = document.createElement("h4");
+    h4.textContent = s.label + (s.unit ? " (" + s.unit + ")" : "");
+    card.appendChild(h4);
+
+    var svg = document.createElementNS(SVG_NS, "svg");
+    svg.setAttribute("viewBox", "0 0 " + VB_W + " " + VB_H);
+
+    var axisX = document.createElementNS(SVG_NS, "line");
+    axisX.setAttribute("class", "axis");
+    axisX.setAttribute("x1", M.l); axisX.setAttribute("y1", M.t + PLOT_H);
+    axisX.setAttribute("x2", M.l + PLOT_W); axisX.setAttribute("y2", M.t + PLOT_H);
+    svg.appendChild(axisX);
+
+    var axisY = document.createElementNS(SVG_NS, "line");
+    axisY.setAttribute("class", "axis");
+    axisY.setAttribute("x1", M.l); axisY.setAttribute("y1", M.t);
+    axisY.setAttribute("x2", M.l); axisY.setAttribute("y2", M.t + PLOT_H);
+    svg.appendChild(axisY);
+
+    [0.4, 0.6, 0.8].forEach(function (v) {
+      var t = document.createElementNS(SVG_NS, "text");
+      t.setAttribute("class", "tick-label");
+      t.setAttribute("x", vx(v));
+      t.setAttribute("y", M.t + PLOT_H + 11);
+      t.setAttribute("text-anchor", "middle");
+      t.textContent = v.toFixed(1);
+      svg.appendChild(t);
+    });
+    var xlab = document.createElementNS(SVG_NS, "text");
+    xlab.setAttribute("class", "x-label");
+    xlab.setAttribute("x", M.l + PLOT_W - 2);
+    xlab.setAttribute("y", VB_H - 2);
+    xlab.setAttribute("text-anchor", "end");
+    xlab.textContent = "Voltage (V)";
+    svg.appendChild(xlab);
+
+    [s.lo, (s.lo + s.hi) / 2, s.hi].forEach(function (val) {
+      var t = document.createElementNS(SVG_NS, "text");
+      t.setAttribute("class", "tick-label");
+      t.setAttribute("x", M.l - 3);
+      t.setAttribute("y", chartVy(s, val) + 3);
+      t.setAttribute("text-anchor", "end");
+      t.textContent = val.toFixed(1);
+      svg.appendChild(t);
+    });
+
+    var curve = document.createElementNS(SVG_NS, "path");
+    curve.setAttribute("class", "curve");
+    curve.setAttribute("style", "stroke:" + s.color);
+    svg.appendChild(curve);
+
+    var liveLine = document.createElementNS(SVG_NS, "line");
+    liveLine.setAttribute("class", "live-line");
+    liveLine.setAttribute("y1", M.t);
+    liveLine.setAttribute("y2", M.t + PLOT_H);
+    svg.appendChild(liveLine);
+
+    var liveRing = document.createElementNS(SVG_NS, "circle");
+    liveRing.setAttribute("class", "live-ring");
+    liveRing.setAttribute("r", 6);
+    svg.appendChild(liveRing);
+
+    var liveDot = document.createElementNS(SVG_NS, "circle");
+    liveDot.setAttribute("r", 4.5);
+    liveDot.setAttribute("style", "fill:" + s.color);
+    svg.appendChild(liveDot);
+
+    var liveLabel = document.createElementNS(SVG_NS, "text");
+    liveLabel.setAttribute("class", "live-label");
+    svg.appendChild(liveLabel);
+
+    // hover crosshair
+    var hoverLine = document.createElementNS(SVG_NS, "line");
+    hoverLine.setAttribute("class", "hover-line");
+    hoverLine.setAttribute("y1", M.t);
+    hoverLine.setAttribute("y2", M.t + PLOT_H);
+    hoverLine.style.display = "none";
+    svg.appendChild(hoverLine);
+
+    var hoverTipBg = document.createElementNS(SVG_NS, "rect");
+    hoverTipBg.setAttribute("class", "hover-tip-bg");
+    hoverTipBg.setAttribute("rx", 2);
+    hoverTipBg.setAttribute("height", 14);
+    hoverTipBg.style.display = "none";
+    svg.appendChild(hoverTipBg);
+
+    var hoverTipText = document.createElementNS(SVG_NS, "text");
+    hoverTipText.setAttribute("class", "hover-tip-text");
+    hoverTipText.style.display = "none";
+    svg.appendChild(hoverTipText);
+
+    card.appendChild(svg);
+    chartsEl.appendChild(card);
+
+    chartRefs[s.key] = {
+      svg: svg, curve: curve, liveLine: liveLine, liveRing: liveRing, liveDot: liveDot, liveLabel: liveLabel,
+      hoverLine: hoverLine, hoverTipBg: hoverTipBg, hoverTipText: hoverTipText
+    };
+
+    svg.addEventListener("pointermove", function (e) {
+      var rect = svg.getBoundingClientRect();
+      var px = (e.clientX - rect.left) * (VB_W / rect.width);
+      var t = (px - M.l) / PLOT_W;
+      if (t < 0 || t > 1) { hideHover(s.key); return; }
+      var idx = Math.round(t * (N_SWEEP - 1));
+      idx = Math.max(0, Math.min(N_SWEEP - 1, idx));
+      showHover(s.key, idx);
+    });
+    svg.addEventListener("pointerleave", function () { hideHover(s.key); });
+  });
+
+  var lastSweep = null; // {vs, values: {key: [..]}}
+
+  function showHover(key, idx) {
+    if (!lastSweep) return;
+    var s = SERIES.filter(function (x) { return x.key === key; })[0];
+    var ref = chartRefs[key];
+    var v = lastSweep.vs[idx];
+    var val = lastSweep.values[key][idx];
+    var x = vx(v);
+    ref.hoverLine.setAttribute("x1", x);
+    ref.hoverLine.setAttribute("x2", x);
+    ref.hoverLine.style.display = "";
+
+    var text = "V " + v.toFixed(2) + "  ·  " + val.toFixed(3);
+    ref.hoverTipText.textContent = text;
+    ref.hoverTipText.style.display = "";
+    ref.hoverTipBg.style.display = "";
+
+    var approxW = text.length * 5.2 + 8;
+    var tipX = Math.min(Math.max(x - approxW / 2, M.l), M.l + PLOT_W - approxW);
+    ref.hoverTipBg.setAttribute("x", tipX);
+    ref.hoverTipBg.setAttribute("y", M.t);
+    ref.hoverTipBg.setAttribute("width", approxW);
+    ref.hoverTipText.setAttribute("x", tipX + 4);
+    ref.hoverTipText.setAttribute("y", M.t + 10);
+  }
+  function hideHover(key) {
+    var ref = chartRefs[key];
+    ref.hoverLine.style.display = "none";
+    ref.hoverTipBg.style.display = "none";
+    ref.hoverTipText.style.display = "none";
+  }
+
+  var W = null;
+  var raf = null;
+
+  function scheduleUpdate() {
+    if (raf) return;
+    raf = requestAnimationFrame(function () { raf = null; update(); });
+  }
+
+  function currentRaw() {
+    var raw = {};
+    RAW_SPECS.forEach(function (spec) { raw[spec.key] = parseFloat(sliderInputs[spec.key].value); });
+    return raw;
+  }
+
+  function update() {
+    if (!W) return;
+    var raw = currentRaw();
+
+    RAW_SPECS.forEach(function (spec) {
+      var row = sliderInputs[spec.key].closest(".pinn-slider-row");
+      var pv = row.querySelector(".pv");
+      pv.textContent = fmt(raw[spec.key], spec.key === "voltage" ? 3 : 1);
+    });
+
+    var vs = [];
+    for (var k = 0; k < N_SWEEP; k++) vs.push(VOLT_LO + (VOLT_HI - VOLT_LO) * k / (N_SWEEP - 1));
+    var values = { current: [], power: [], se: [], odu: [] };
+    vs.forEach(function (v) {
+      var r = Object.assign({}, raw, { voltage: v });
+      var out = predict(r, W);
+      values.current.push(out.current);
+      values.power.push(out.power);
+      values.se.push(out.se);
+      values.odu.push(out.odu);
+    });
+    lastSweep = { vs: vs, values: values };
+
+    var now = predict(raw, W);
+    SERIES.forEach(function (s) {
+      readoutValueEls[s.key].textContent = fmt(now[s.key], 4) + (s.unit ? " " + s.unit : "");
+
+      var ref = chartRefs[s.key];
+      var d = "";
+      for (var i = 0; i < N_SWEEP; i++) {
+        var x = vx(vs[i]), y = chartVy(s, values[s.key][i]);
+        d += (i === 0 ? "M" : "L") + x.toFixed(1) + "," + y.toFixed(1) + " ";
+      }
+      ref.curve.setAttribute("d", d);
+
+      var mx = vx(raw.voltage), my = chartVy(s, now[s.key]);
+      ref.liveLine.setAttribute("x1", mx); ref.liveLine.setAttribute("x2", mx);
+      ref.liveRing.setAttribute("cx", mx); ref.liveRing.setAttribute("cy", my);
+      ref.liveDot.setAttribute("cx", mx); ref.liveDot.setAttribute("cy", my);
+
+      var labelAbove = my > M.t + 12;
+      ref.liveLabel.setAttribute("x", Math.min(Math.max(mx, M.l + 18), M.l + PLOT_W - 4));
+      ref.liveLabel.setAttribute("y", labelAbove ? my - 9 : my + 16);
+      ref.liveLabel.setAttribute("text-anchor", mx > M.l + PLOT_W - 40 ? "end" : "middle");
+      ref.liveLabel.textContent = now[s.key].toFixed(3);
+    });
+  }
+
+  if (window.PEMFC_PINN_WEIGHTS) {
+    W = window.PEMFC_PINN_WEIGHTS;
+    statusEl.textContent = "";
+    update();
+  } else {
+    statusEl.textContent = "Could not load the model weights (data/pemfc-pinn-weights.js did not load). Try reloading the page.";
+  }
+})();
+</script>
+</body>
+</html>

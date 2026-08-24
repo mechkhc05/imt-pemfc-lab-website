@@ -1,1 +1,5 @@
 .claude/settings.local.json
+
+# internal tracking sheets, not meant to be published on the site
+lab-homepage/publication/실적현황_conference.xlsx
+lab-homepage/publication/실적현황_patent.xlsx
