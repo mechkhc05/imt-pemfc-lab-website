@@ -1,0 +1,3 @@
+studentName,studentId,program,companyName,projectTitle,startDate,endDate,advisorName,status
+홍길동,202012345,BACHELOR,예시기업㈜,PEMFC 스택 열관리 시스템 연구,2026-04-01,2026-12-31,김현철,ACTIVE
+김민수,202154321,MASTER,예시엔지니어링,수소 저장합금 열특성 분석,2026-04-01,2026-12-31,김현철,ACTIVE

@@ -1,0 +1,135 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  REVIEWER
+}
+
+enum Program {
+  BACHELOR
+  MASTER
+  DOCTORATE
+}
+
+enum MatchStatus {
+  ACTIVE
+  EMPLOYED
+  ADVANCED_STUDY
+  UNDECIDED
+}
+
+enum ReportStatus {
+  SUBMITTED
+  REVIEWED
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String   @unique
+  passwordHash String
+  name         String
+  role         Role
+  createdAt    DateTime @default(now())
+
+  reviewedReports      Report[]       @relation("ReviewedBy")
+  createdAnnouncements Announcement[] @relation("AnnouncementAuthor")
+  createdActivities    Activity[]     @relation("ActivityAuthor")
+}
+
+model Company {
+  id      String  @id @default(cuid())
+  name    String  @unique
+  matches Match[]
+}
+
+model Match {
+  id            String      @id @default(cuid())
+  studentName   String
+  studentId     String
+  program       Program
+  companyId     String
+  company       Company     @relation(fields: [companyId], references: [id])
+  projectTitle  String
+  startDate     DateTime
+  endDate       DateTime
+  advisorName   String
+  status        MatchStatus @default(ACTIVE)
+
+  reports Report[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([studentName, studentId])
+}
+
+model Report {
+  id          String       @id @default(cuid())
+  matchId     String
+  match       Match        @relation(fields: [matchId], references: [id])
+  periodStart DateTime
+  periodEnd   DateTime
+  content     String
+  status      ReportStatus @default(SUBMITTED)
+
+  reviewerComment String?
+  reviewedById    String?
+  reviewedBy      User?     @relation("ReviewedBy", fields: [reviewedById], references: [id])
+  reviewedAt      DateTime?
+
+  attachments ReportAttachment[]
+
+  submittedAt DateTime @default(now())
+}
+
+model ReportAttachment {
+  id       String @id @default(cuid())
+  reportId String
+  report   Report @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  filename String
+  url      String
+  size     Int
+  order    Int    @default(0)
+}
+
+model Activity {
+  id           String   @id @default(cuid())
+  title        String
+  description  String
+  activityDate DateTime
+
+  photos ActivityPhoto[]
+
+  createdById String
+  createdBy   User   @relation("ActivityAuthor", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+}
+
+model ActivityPhoto {
+  id         String   @id @default(cuid())
+  activityId String
+  activity   Activity @relation(fields: [activityId], references: [id], onDelete: Cascade)
+  url        String
+  order      Int      @default(0)
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  body      String
+  startDate DateTime
+  endDate   DateTime
+
+  createdById String
+  createdBy   User   @relation("AnnouncementAuthor", fields: [createdById], references: [id])
+
+  createdAt DateTime @default(now())
+}
